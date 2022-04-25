@@ -9,6 +9,7 @@ import java.util.Set;
 
 /**
  * OKHttp封装工具类
+ *
  * @author hutu
  * @date 2018/12/20 15:13
  */
@@ -26,7 +27,7 @@ public class OkHttpUtils {
         }
         StringBuilder urlSb = new StringBuilder(url);
         if (prarmsMap != null) {
-            addPrarms(urlSb, prarmsMap);
+            addParams(urlSb, prarmsMap);
         }
         Request.Builder builder = new Request.Builder();
         if (headersMap != null) {
@@ -34,7 +35,10 @@ public class OkHttpUtils {
         }
         Request request = builder.url(urlSb.toString()).build();
         Response response = OK_HTTP_CLIENT.newCall(request).execute();
-        return response.body().string();
+        if (response.body() != null) {
+            return response.body().string();
+        }
+        return null;
     }
 
     public static String doGet(String url, Map<String, String> prarmsMap) throws IOException {
@@ -62,7 +66,10 @@ public class OkHttpUtils {
         }
         Request request = builder.url(url).post(body).build();
         Response response = OK_HTTP_CLIENT.newCall(request).execute();
-        return response.body().string();
+        if (response.body() != null) {
+            return response.body().string();
+        }
+        return null;
     }
 
     public static String doPost(String url, Map<String, String> prarmsMap) throws IOException {
@@ -76,7 +83,7 @@ public class OkHttpUtils {
     /**
      * 为HttpGet请求拼接多个参数
      */
-    public static void addPrarms(StringBuilder url, Map<String, String> values) {
+    public static void addParams(StringBuilder url, Map<String, String> values) {
         url.append("?");
         Set<String> keys = values.keySet();
         for (String key : keys) {
@@ -98,11 +105,12 @@ public class OkHttpUtils {
      */
     public static void enqueue(Request request) {
         OK_HTTP_CLIENT.newCall(request).enqueue(new Callback() {
-
+            @Override
             public void onFailure(Call call, IOException e) {
                 System.out.println("失败处理逻辑");
             }
 
+            @Override
             public void onResponse(Call call, Response response) {
                 System.out.println("成功处理逻辑");
             }
